@@ -1,0 +1,12 @@
+# exclude local dev stuff
+.DS_Store
+.python-version
+.ipynb_checkpoints
+*.ipynb
+venv
+
+# do not commit the env file when present
+.env
+
+# store maps locally
+maps/*.walk
