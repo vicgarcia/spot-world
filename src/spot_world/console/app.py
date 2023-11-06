@@ -100,10 +100,9 @@ class App(cmd2.Cmd):
         self._set_prompt()
         return stop
 
-    # respond to 'exit' or 'quit'
-
     def _exit(self):
         ''' exit the application '''
+        # respond to 'exit' or 'quit'
         try:
             self.spot.estop.shutdown()
         except Exception:
@@ -117,9 +116,7 @@ class App(cmd2.Cmd):
 
     def do_quit(self, *args, **kwargs):
         return self._exit()
-
-    # todo: figure out how to catch/handle estop keepalive errors?
-
+   
     _estop_parser = cmd2.Cmd2ArgumentParser()
     _estop_command_choices = ['setup', 'shutdown', 'go', 'stop']
     _estop_parser.add_argument('command', choices=_estop_command_choices, help='manage estop for robot')
@@ -141,6 +138,7 @@ class App(cmd2.Cmd):
             self.spot.estop.allow()
 
     def sigint_handler(self, signum: int, _: FrameType) -> None:
+         # todo: figure out how to catch/handle estop keepalive errors?
         # override default sigint to use ctrl-c to engage the estop
         if self.spot.estop.status != EstopStatus.NONE:
             # todo: is there a better way? is this async message?
