@@ -116,7 +116,7 @@ class App(cmd2.Cmd):
 
     def do_quit(self, *args, **kwargs):
         return self._exit()
-   
+
     _estop_parser = cmd2.Cmd2ArgumentParser()
     _estop_command_choices = ['setup', 'shutdown', 'go', 'stop']
     _estop_parser.add_argument('command', choices=_estop_command_choices, help='manage estop for robot')
@@ -288,7 +288,7 @@ class App(cmd2.Cmd):
             if dock_id:
                 waypoint_id = self.map.get_waypoint_id_by_fiducial(dock_id)
                 self.spot.graph_nav.navigate_to_waypoint(waypoint_id)
-                self.spot.docking.dock(dock_id)                
+                self.spot.docking.dock(dock_id)
         except Exception as e:
             self.poutput(str(e))
 
