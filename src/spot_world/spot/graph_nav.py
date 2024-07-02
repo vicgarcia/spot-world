@@ -109,31 +109,6 @@ class Map:
         distance, waypoint_id = sorted(distances_and_waypoints)[0]
         return waypoint_id
 
-    # todo: not really tested or utilized since 3.1, may be broken
-    def to_filesystem(self, base_path):
-        base_path.resolve()
-        if not base_path.exists():
-            raise GraphNavClient(f"base path {base_path} not found")
-        graph_path = pathlib.Path(base_path, 'graph')
-        with open(graph_path, 'wb+') as graph_file:
-            graph_file.write(self.graph.SerializeToString())
-        waypoint_snapshots_path = pathlib.Path(base_path, 'waypoint_snapshots')
-        os.makedirs(waypoint_snapshot_path, exist_ok=True)
-        for waypoint in self.graph.waypoints:
-            if len(waypoint.snapshot_id) == 0:
-                continue
-            waypoint_snapshot_path = pathlib.Path(waypoint_snapshots_path, waypoint.snapshot_id)
-            with open(waypoint_snapshot_path, 'wb+') as waypoint_snapshot_file:
-                waypoint_snapshot_file.write(self.waypoint_snapshots[waypoint.snapshot_id].SerializeToString())
-        edge_snapshots_path = pathlib.Path(base_path, 'edge_snapshots')
-        os.makedirs(edge_snapshots_path)
-        for edge in self.graph.edges:
-            if len(edge.snapshot_id) == 0:
-                continue
-            edge_snapshot_path = pathlib.Path(edge_snapshots_path, edge.snapshot_id)
-            with open(edge_snapshot_path, 'wb+') as edge_snapshot_file:
-                edge_snapshot_file.write(self.edge_snapshots[edge.snapshot_id].SerializeToString())
-
     @classmethod
     def from_filesystem(cls, base_path: pathlib.Path):
         # expect the base path to be the folder from a autowalk from tablet
