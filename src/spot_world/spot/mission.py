@@ -38,25 +38,22 @@ class MissionFacade:
     def status(self):
         return self._last_status
 
-    def run(self, output_function=None, mission_timeout=30, disable_directed_exploration=True):
-        if not output_function:
-            output_function = lambda x: None
+    def run(self, mission_timeout=30, disable_directed_exploration=True):
         mission_state = self.client.get_state()
         logger.debug(f"initial mission state {mission_state}")
         while mission_state.status in (mission_pb2.State.STATUS_NONE, mission_pb2.State.STATUS_RUNNING):
             self._last_status = MissionStatus.RUNNING
             if mission_state.questions:
-                # todo: try to handle these ...
-                # when reroute is an option, go for that
-                # when skip is the best option, go for that
-                # otherwise, fail?
+                # fail the mission unless we can handle the question w/o user input
+                question_fails_mission = True
                 for question in mission_state.questions:
-                    output_function(f"{question.id} {question.text}")
-                    for option in question.options:
-                        output_function(f"{option.answer_code} {option.text}")
-                    # self.client.answer_question(question_id, answer_code)
-                logger.debug(f"last mission state {mission_state}")
-                return MissionStatus.FAILED_ON_QUESTION
+                    # todo: for now we ignore any questions w/ SEVERITY_LEVEL_INFO
+                    #       in the future we could either automatically act or prompt user
+                    if question.severity == 1:  # SEVERITY_LEVEL_INFO
+                        question_fails_mission = False
+                if question_fails_mission:
+                    logger.debug(f"fail mission due to spot question prompt")
+                    return MissionStatus.FAILED_ON_QUESTION
             local_pause_time = time.time() + mission_timeout
             body_lease = self._spot.lease.client.lease_wallet.advance()
             mission_settings = mission_pb2.PlaySettings(
