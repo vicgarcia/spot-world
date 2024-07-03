@@ -8,5 +8,6 @@ venv
 # do not commit the env file when present
 .env
 
-# store maps locally
-maps/*.walk
+# store autowalks locally
+autowalks/*.walk
+
