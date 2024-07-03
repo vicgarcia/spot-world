@@ -170,20 +170,14 @@ class App(cmd2.Cmd):
         except LeaseError as e:
             self.poutput(str(e))
 
-    _power_parser = cmd2.Cmd2ArgumentParser()
-    _power_command_choices = ['on', 'off', 'status']
-    _power_parser.add_argument('command', choices=_power_command_choices, help='manage robot power on/off')
+    _motors_parser = cmd2.Cmd2ArgumentParser()
+    _motors_command_choices = ['on', 'off']
+    _motors_parser.add_argument('command', choices=_motors_command_choices, help='manage robot motors on/off')
 
-    @cmd2.with_argparser(_power_parser)
-    def do_power(self, args):
+    @cmd2.with_argparser(_motors_parser)
+    def do_motors(self, args):
         ''' manage robot motor power '''
-        # todo: turn this into useful output
-        if args.command == 'status':
-            state = self.spot.robot_state.get()
-            self.poutput(state.power_state)
-            self.poutput(state.battery_states)
-        # turn motors on and off
-        elif args.command == 'on':
+        if args.command == 'on':
             self.spot.power.on()
         elif args.command == 'off':
             self.spot.power.off()
