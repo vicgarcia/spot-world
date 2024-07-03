@@ -23,7 +23,7 @@ class DockingFacade:
         return self._spot._robot.ensure_client(DockingClient.default_service_name)
 
     def get_dock_id(self):
-        # BD function returns None when not docked
+        # returns None when not docked
         return get_dock_id(self._spot._robot)
 
     @property

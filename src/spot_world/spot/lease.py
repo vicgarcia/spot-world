@@ -28,7 +28,7 @@ class LeaseFacade:
     def status(self):
         if self._lease is not None:
             return LeaseStatus.ACTIVE
-        LeaseStatus.NONE
+        return LeaseStatus.NONE
 
     @property
     def current(self):

@@ -12,9 +12,6 @@ from bosdyn.api.graph_nav import graph_nav_pb2, map_pb2, nav_pb2
 logger = logging.getLogger(__name__)
 
 
-class GraphNavError(Exception):
-    pass
-
 
 class Map:
 
@@ -24,8 +21,6 @@ class Map:
         self.waypoint_snapshots = waypoint_snapshots
         # edge_snapshots is a dict of edge snapshot id -> map_pb2.EdgeSnapshot
         self.edge_snapshots = edge_snapshots
-        # # setup a dict of waypoint id -> waypoint name
-        # self.waypoint_names = {w.id: w.annotations.name for w in self.graph.waypoints}
 
     # based on the assumption that a graph is created via autowalk
     # and that the first (by timestamp) waypoint is the begining of the mission
@@ -114,7 +109,7 @@ class Map:
         # expect the base path to be the folder from a autowalk from tablet
         graph_path = pathlib.Path(base_path, 'graph')
         if not graph_path.exists():
-            raise GraphNavClient(f"graph file {graph_path} not found")
+            raise GraphNavError(f"graph file {graph_path} not found")
         graph = map_pb2.Graph()
         with open(graph_path, 'rb') as graph_file:
             graph.ParseFromString(graph_file.read())
@@ -124,7 +119,7 @@ class Map:
                 continue
             waypoint_snapshot_path = pathlib.Path(base_path, 'waypoint_snapshots', waypoint.snapshot_id)
             if not waypoint_snapshot_path.exists():
-                raise GraphNavClient(f"waypoint snapshot file {waypoint_snapshot_path} not found")
+                raise GraphNavError(f"waypoint snapshot file {waypoint_snapshot_path} not found")
             waypoint_snapshot = map_pb2.WaypointSnapshot()
             with open(waypoint_snapshot_path, 'rb') as waypoint_snapshot_file:
                 waypoint_snapshot.ParseFromString(waypoint_snapshot_file.read())
@@ -135,12 +130,16 @@ class Map:
                 continue
             edge_snapshot_path = pathlib.Path(base_path, 'edge_snapshots', edge.snapshot_id)
             if not edge_snapshot_path.exists():
-                raise GraphNavClient(f"edge snapshot file {edge_snapshot_path} not found")
+                raise GraphNavError(f"edge snapshot file {edge_snapshot_path} not found")
             edge_snapshot = map_pb2.EdgeSnapshot()
             with open(edge_snapshot_path, 'rb') as edge_snapshot_file:
                 edge_snapshot.ParseFromString(edge_snapshot_file.read())
             edge_snapshots[edge.snapshot_id] = edge_snapshot
         return cls(graph, waypoint_snapshots, edge_snapshots)
+
+
+class GraphNavError(Exception):
+    pass
 
 
 class GraphNavFacade:
