@@ -16,16 +16,22 @@ logger = logging.getLogger(__name__)
 
 class App(cmd2.Cmd):
 
-    def __init__(self, spot: Spot, autowalk_path: pathlib.Path):
+    def __init__(self, spot: Spot, autowalk_path: pathlib.Path, initialize_robot=False):
         # setup cmd2 app
         cmd2.Cmd.__init__(self, include_py=True)
         self._cleanup_features()
         # autowalk_path is validated in the run() factory method
         self.autowalk_path = autowalk_path
+        # attach the robot
+        self.spot = spot
         # load the map
         self.map = Map.from_filesystem(autowalk_path)
+        # upload map to the robot
+        self.spot.graph_nav.clear()
+        self.spot.graph_nav.upload_map(self.map)
         # initialize the robot
-        self.spot = self._initialize_robot(spot)
+        if initialize_robot:
+            self._initialize_robot()
         # dock_id to be set when undocking
         self.dock_id = None
         # export these for use in the python shell
@@ -44,6 +50,14 @@ class App(cmd2.Cmd):
         delattr(cmd2.Cmd, 'do_run_script')
         delattr(cmd2.Cmd, 'do_run_pyscript')
         self.hidden_commands += ['alias', 'history', 'macro', 'set' ]
+
+    def _initialize_robot(self):
+        # setup estop
+        self.spot.estop.setup()
+        # acquire lease
+        self.spot.lease.take()
+        # power on motors
+        self.spot.power.on()
 
     _motor_status_color = {
         PowerStatus.OFF: cmd2.ansi.Fg.WHITE,
@@ -97,7 +111,9 @@ class App(cmd2.Cmd):
         ''' exit the application '''
         # respond to 'exit' or 'quit'
         try:
+            self.spot.power.off()
             self.spot.estop.shutdown()
+            self.spot.lease.release()
         except Exception:
             pass
         # Return True to stop the command loop
@@ -314,6 +330,10 @@ class App(cmd2.Cmd):
             nargs='+',
             required=True,
         )
+        parser.add_argument('--initialize',
+            help='enable initialize robot on startup',
+            action='store_true',
+        )
         options = parser.parse_args(sys.argv[1:])
 
         # expect a path to an autowalk map and set of missions
@@ -332,5 +352,5 @@ class App(cmd2.Cmd):
         sys.argv = sys.argv[:1]
 
         # start app
-        app = cls(spot, autowalk_path)
+        app = cls(spot, autowalk_path, initialize_robot=options.initialize)
         sys.exit(app.cmdloop())
