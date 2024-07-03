@@ -45,55 +45,48 @@ class App(cmd2.Cmd):
         delattr(cmd2.Cmd, 'do_run_pyscript')
         self.hidden_commands += ['alias', 'history', 'macro', 'set' ]
 
-    def _initialize_robot(self, spot):
-        # setup the estop
-        spot.estop.setup()
-        # setup the lease
-        spot.lease.take()
-        # power on the motors
-        spot.power.on()
-        # if we're docked, load the map
-        if spot.docking.is_docked():
-            spot.graph_nav.clear()
-            spot.graph_nav.upload_map(self.map)
-            # localization happens on undocking
-        else:
-            # it's a whole thing to figure out how to evaluate if we
-            # are using the same map that is already on the robot
-            # solving this isn't really the point of what i'm doing right now
-            # so we assume we're already using the same map and localized
-            pass
-        # return the initialized robot object
-        return spot
-
-    _power_status_color = {
-        PowerStatus.OFF: cmd2.ansi.Fg.RED,
+    _motor_status_color = {
+        PowerStatus.OFF: cmd2.ansi.Fg.WHITE,
         PowerStatus.ON: cmd2.ansi.Fg.GREEN,
     }
+
     _lease_status_color = {
-        LeaseStatus.NONE: cmd2.ansi.Fg.RED,
+        LeaseStatus.NONE: cmd2.ansi.Fg.WHITE,
         LeaseStatus.ACTIVE: cmd2.ansi.Fg.GREEN,
     }
+
     _estop_status_color = {
         EstopStatus.ERROR: cmd2.ansi.Fg.YELLOW,
-        EstopStatus.NONE: cmd2.ansi.Fg.YELLOW,
+        EstopStatus.NONE: cmd2.ansi.Fg.WHITE,
         EstopStatus.ESTOPPED: cmd2.ansi.Fg.RED,
         EstopStatus.NOT_ESTOPPED: cmd2.ansi.Fg.GREEN,
     }
 
+    def _battery_status_color(self, battery_level: int):
+        if battery_level > 30:
+            return cmd2.ansi.Fg.GREEN
+        elif battery_level > 10:
+            return cmd2.ansi.Fg.YELLOW
+        else:
+            return cmd2.ansi.Fg.RED
+
     def _set_prompt(self):
         # new line before prompt
         p = '\n'
-        # todo: battery indicator
-        # estop indicator
-        p += cmd2.ansi.style("estop", fg=self._estop_status_color[self.spot.estop.status])
-        p += ' '
         # lease indicator
-        p += cmd2.ansi.style("lease", fg=self._lease_status_color[self.spot.lease.status])
+        p += cmd2.ansi.style("LEASE", fg=self._lease_status_color[self.spot.lease.status])
         p += ' '
-        # power indicator
-        p += cmd2.ansi.style(f"power", fg=self._power_status_color[self.spot.power.status])
+        # estop indicator
+        p += cmd2.ansi.style(f"ESTOP", fg=self._estop_status_color[self.spot.estop.status])
         p += ' '
+        # motor power indicator
+        p += cmd2.ansi.style(f"MOTOR", fg=self._motor_status_color[self.spot.power.status])
+        p += ' '
+        # battery indicator
+        battery_level = self.spot.power.battery
+        p += cmd2.ansi.style(f"{battery_level}%", fg=self._battery_status_color(battery_level))
+        p += ' # '
+        # assign string to prompt
         self.prompt = p
 
     def postcmd(self, stop, line):

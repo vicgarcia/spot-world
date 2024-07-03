@@ -30,6 +30,14 @@ class PowerFacade:
             return PowerStatus.ON
         return PowerStatus.OFF
 
+    @property
+    def battery(self):
+        # returns percentage as a string, XX%
+        robot_state = self._spot.robot_state.get()
+        if len(robot_state.battery_states) > 0:
+            return int(robot_state.battery_states[0].charge_percentage.value)
+        return 0
+
     def on(self):
         self._spot._robot.power_on(timeout_sec=30)
 
