@@ -298,9 +298,34 @@ class App(cmd2.Cmd):
         except Exception as e:
             self.poutput(str(e))
 
-    _missions_execute_parser = _missions_subparser.add_parser('execute', help='load and run a mission from the filesystem')
+    _missions_execute_parser = _missions_subparser.add_parser('execute', help='load and run a mission')
     _missions_execute_parser.add_argument('name', nargs='+', type=str, help='name of mission to execute')
     _missions_execute_parser.set_defaults(func=missions_execute)
+
+    def missions_loop(self, args):
+        try:
+            mission = Mission.from_filesystem(self.autowalk_path, f"{' '.join(args.name)}.walk")
+            mission.skip_docking()  # when running missions via spot console we skip docking
+            self.spot.autowalk.upload_mission(mission)
+            # when the robot is docked when the loop starts
+            # keep the dock id and return when mission complete
+            dock_id = self.spot.docking.get_dock_id()
+            if dock_id:
+                self.dock_id = dock_id
+                self.spot.docking.undock()
+                self.spot.graph_nav.localize_to_fiducial()
+            # run the mission on a loop
+            # the only exit here is engaging the estop then manually assuming control
+            while True:
+                self.spot.mission.run()
+                # reload mission to run again
+                self.spot.autowalk.upload_mission(mission)
+        except Exception as e:
+            self.poutput(str(e))
+
+    _missions_loop_parser = _missions_subparser.add_parser('loop', help='load and run a mission on a loop')
+    _missions_loop_parser.add_argument('name', nargs='+', type=str, help='name of mission to execute')
+    _missions_loop_parser.set_defaults(func=missions_loop)
 
     @cmd2.with_argparser(_missions_parser)
     def do_missions(self, args):
