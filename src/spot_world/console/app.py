@@ -3,6 +3,7 @@ import cmd2
 import sys
 import argparse
 import pathlib
+import time
 from types import FrameType
 from spot_world.spot import Spot
 from spot_world.spot.estop import EstopStatus
@@ -153,6 +154,8 @@ class App(cmd2.Cmd):
             # todo: is there a better way? is this async message?
             self.poutput('\nengaging estop')
             self.spot.estop.settle_then_cut()
+            # wait for robot status to update for the prompt
+            time.sleep(3)
             # update the prompt to ensure the estop status is reflected
             self._set_prompt()
         return super().sigint_handler(signum, _)
