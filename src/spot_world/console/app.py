@@ -158,10 +158,17 @@ class App(cmd2.Cmd):
             self._set_prompt()
         return super().sigint_handler(signum, _)
 
-    def do_state(self, args):
+    def do_status(self, args):
+        # todo: print some basic info we can get w/o a lease first
         state = self.spot.robot_state.get()
         # todo: format the output here into something more approachable
         self.poutput(state)
+        dock_id = self.spot.docking.get_dock_id()
+        if dock_id is not None:
+            self.poutput(f"robot is docked at {dock_id}")
+        else:
+            pass
+            # is the robot standing?
 
     _lease_parser = cmd2.Cmd2ArgumentParser()
     _lease_action_choices = ['acquire', 'take', 'release']
