@@ -32,7 +32,7 @@ class App(cmd2.Cmd):
         # upload map to the robot
         self.spot.graph_nav.clear()
         self.spot.graph_nav.upload_map(self.map)
-        # initialize the robot
+        # optionally initialize the robot
         if initialize_robot:
             self._initialize_robot()
         # dock_id to be set when undocking
@@ -52,7 +52,7 @@ class App(cmd2.Cmd):
         delattr(cmd2.Cmd, 'do_shortcuts')
         delattr(cmd2.Cmd, 'do_run_script')
         delattr(cmd2.Cmd, 'do_run_pyscript')
-        self.hidden_commands += ['alias', 'history', 'macro', 'set' ]
+        self.hidden_commands += [ 'alias', 'history', 'macro', 'set' ]
 
     def _initialize_robot(self):
         # setup estop
@@ -278,7 +278,6 @@ class App(cmd2.Cmd):
         for mission in missions_path.glob('*.walk'):
             # exclude the .walk extension from the listings
             self.poutput(mission.stem.replace('.walk', ''))
-        # todo: do not display mission w/ same name as map
 
     _missions_list_parser = _missions_subparser.add_parser('list', help='list available missions')
     _missions_list_parser.set_defaults(func=missions_list)
@@ -286,7 +285,7 @@ class App(cmd2.Cmd):
     def missions_execute(self, args):
         try:
             mission = Mission.from_filesystem(self.autowalk_path, f"{' '.join(args.name)}.walk")
-            mission.skip_docking()  # when running missions via spot console we skip docking
+            mission.skip_docking()  # when running missions via spot console we skip docking by default
             self.spot.autowalk.upload_mission(mission)
             # when the robot is docked when the mission is run
             # keep the dock id and return when mission complete
@@ -296,6 +295,7 @@ class App(cmd2.Cmd):
                 self.spot.docking.undock()
                 self.spot.graph_nav.localize_to_fiducial()
             self.spot.mission.run()
+            # if the robot was docked when the mission was started, return to the dock
             if dock_id:
                 waypoint_id = self.map.get_waypoint_id_by_fiducial(dock_id)
                 self.spot.graph_nav.navigate_to_waypoint(waypoint_id)
@@ -385,8 +385,7 @@ class App(cmd2.Cmd):
 
         # expect a path to an autowalk map and set of missions
         # this is the .walk folder and it's contents from the tablet
-        # validate the path here to fail fast w/ error message
-
+        # validate the path here and fail w/ error message
         autowalk_path = pathlib.Path(' '.join(args.autowalk)).resolve()
         if not autowalk_path.exists():
             print(f"{autowalk_path} does not exist")
