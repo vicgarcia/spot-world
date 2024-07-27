@@ -1,9 +1,11 @@
 import logging
 import cmd2
 import sys
+import os
 import argparse
 import pathlib
 import time
+from dotenv import load_dotenv
 from types import FrameType
 from spot_world.spot import Spot
 from spot_world.spot.estop import EstopStatus
@@ -339,19 +341,25 @@ class App(cmd2.Cmd):
     @classmethod
     def run(cls):
 
+        # get values from .env
+        load_dotenv()
+        hostname = os.getenv('SPOT_HOSTNAME')
+        username = os.getenv('SPOT_USERNAME')
+        password = os.getenv('SPOT_PASSWORD')
+
         # parse arguments
         parser = argparse.ArgumentParser(description='console for controlling SPOT')
         parser.add_argument('--hostname',
             help='ip/hostname of spot robot',
-            required=True,
+            required=hostname == None,
         )
         parser.add_argument('--username',
             help='username to authenticate to spot',
-            required=True,
+            required=username == None,
         )
         parser.add_argument('--password',
             help='password to authenticate to spot',
-            required=True,
+            required=password == None,
         )
         parser.add_argument('--autowalk',
             help='directory containing autowalk to load',
@@ -362,23 +370,31 @@ class App(cmd2.Cmd):
             help='enable initialize robot on startup',
             action='store_true',
         )
-        options = parser.parse_args(sys.argv[1:])
+        args = parser.parse_args(sys.argv[1:])
+
+        # overwrite env values with cli args
+        if args.hostname:
+            hostname = args.hostname
+        if args.username:
+            username = args.username
+        if args.password:
+            password = args.password
 
         # expect a path to an autowalk map and set of missions
         # this is the .walk folder and it's contents from the tablet
         # validate the path here to fail fast w/ error message
 
-        autowalk_path = pathlib.Path(' '.join(options.autowalk)).resolve()
+        autowalk_path = pathlib.Path(' '.join(args.autowalk)).resolve()
         if not autowalk_path.exists():
             print(f"{autowalk_path} does not exist")
             sys.exit(1)
 
         # connect to robot
-        spot = Spot.connect(options.hostname, options.username, options.password)
+        spot = Spot.connect(hostname, username, password)
 
         # clear startup arguments so they aren't passed into cmd2 app
         sys.argv = sys.argv[:1]
 
         # start app
-        app = cls(spot, autowalk_path, initialize_robot=options.initialize)
+        app = cls(spot, autowalk_path, initialize_robot=args.initialize)
         sys.exit(app.cmdloop())
