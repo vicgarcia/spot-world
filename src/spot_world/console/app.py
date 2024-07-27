@@ -114,6 +114,7 @@ class App(cmd2.Cmd):
         ''' exit the application '''
         # respond to 'exit' or 'quit'
         try:
+            self.spot.robot_command.sit()
             self.spot.power.off()
             self.spot.estop.shutdown()
             self.spot.lease.release()
