@@ -2,11 +2,11 @@
 
 ## the idea
 
-I began working on spot-world as a sort of experiment and learning project for working with the Boston Dynamics Spot SDK in late summer 2022. I wanted to learn some of the details of interacting with the underlying robot services as well as explore idea for utilizing the robot.
+I began working on spot-world as a sort of experiment and learning project for working with the [Boston Dynamics Spot SDK](https://dev.bostondynamics.com/) in late summer 2022. I wanted to learn some of the details of interacting with the underlying robot services.
 
-In 2023, I revisited this code for the release of the Spot SDK 3.3 update, specifically to leverage some of the improvements to autowalk mission editing on the tablet.
+In 2023, I revisited this code for the release of the Spot 3.3 firmware update, specifically to leverage some of the improvements to autowalk missions and assist in testing feature development with the robot.
 
-Since then, I've made some improvements to the experience to make spot-world more useful for working with a spot robot day to day. The end result is a console environment for controlling a Spot robot, moving the robot around an autowalk map and running missions.
+Since then, I've made some further improvements to the experience to make spot-world useful for working with a spot robot day to day. The end result is a console environment for controlling a Spot robot, moving the robot around an autowalk map and running missions.
 
 
 ## in action
@@ -15,25 +15,25 @@ Before diving in, take a look at some typical use cases for spot-world
 
 <console screenshot>
 
-Undock and navigate to a given fiducial.
+Undock and navigate to a given fiducial
 ```
 robot undock
 fiducials goto 3
 ```
 
-Run a mission.
+Run a mission
 ```
 mission run industrial-gauge-demo
 ```
 
-Navigate from one dock to another.
+Navigate from one dock to another
 ```
 robot undock
 fiducials goto 525
 robot dock
 ```
 
-Execute a mission on a continous loop.
+Execute a mission on a continous loop
 ```
 mission loop office-tour
 ```
