@@ -131,7 +131,7 @@ class App(cmd2.Cmd):
         return self._exit()
 
     _estop_parser = cmd2.Cmd2ArgumentParser()
-    _estop_command_choices = ['setup', 'shutdown', 'go', 'stop']
+    _estop_command_choices = ['setup', 'shutdown', 'clear']
     _estop_parser.add_argument('command', choices=_estop_command_choices, help='manage estop for robot')
 
     @cmd2.with_argparser(_estop_parser)
@@ -143,22 +143,17 @@ class App(cmd2.Cmd):
         # stops estop keepalive
         elif args.command == 'shutdown':
             self.spot.estop.shutdown()
-        # engage estop to stop the robot
-        elif args.command == 'stop':
-            self.spot.estop.settle_then_cut()
-        # disengage estop to move the robot
-        elif args.command == 'go':
+        # clear estop after engaging with ctrl-c
+        elif args.command == 'clear':
             self.spot.estop.allow()
 
     def sigint_handler(self, signum: int, _: FrameType) -> None:
-         # todo: figure out how to catch/handle estop keepalive errors?
         # override default sigint to use ctrl-c to engage the estop
         if self.spot.estop.status != EstopStatus.NONE:
-            # todo: is there a better way? is this async message?
             self.poutput('\nengaging estop')
             self.spot.estop.settle_then_cut()
             # wait for robot status to update for the prompt
-            time.sleep(3)
+            time.sleep(2)
             # update the prompt to ensure the estop status is reflected
             self._set_prompt()
         return super().sigint_handler(signum, _)
