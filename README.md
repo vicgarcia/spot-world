@@ -96,7 +96,7 @@ Be aware that exiting the applciation while the robot is standing will result in
 
 The status of the robot can be seen using the `status` command.
 
-`status` will print the current status of the robot.
+`status` will print the current status of the robot. This is in the form of the data structure returned from the robot directly, so the formatting is not pretty, but functional.
 
 The status command is available regardless the lease or estop state of the robot.
 
