@@ -13,29 +13,30 @@ Since then, I've made some further improvements to the experience to make spot-w
 
 Before diving in, take a look at some typical use cases for spot-world
 
-<console screenshot>
+![spot world](https://github.com/vicgarcia/spot-world/raw/main/images/terminal.png)
 
-Undock and navigate to a given fiducial
+And an explanation ...
+
+Undock the robot
 ```
 robot undock
-fiducials goto 3
 ```
 
-Run a mission
+List all missions and execute the `goto-lab` mission
 ```
-mission run industrial-gauge-demo
+missions list
+missions execute goto-lab
 ```
 
-Navigate from one dock to another
+List fiducials on the map and navigate to `542`
 ```
-robot undock
-fiducials goto 525
+fiducials list
+fiducials goto 542
+```
+
+Dock the robot at the visible dock
+```
 robot dock
-```
-
-Execute a mission on a continous loop
-```
-mission loop office-tour
 ```
 
 
