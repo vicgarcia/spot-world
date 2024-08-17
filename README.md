@@ -1,4 +1,4 @@
-![spot robot](https://github.com/vicgarcia/spot-world/raw/master/images/header.jpg)
+![spot robot](https://github.com/vicgarcia/spot-world/raw/main/images/header.jpg)
 
 ## the idea
 
