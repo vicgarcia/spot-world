@@ -1,4 +1,4 @@
-<header image>
+![spot robot](https://github.com/vicgarcia/spot-world/raw/master/images/header.jpg)
 
 ## the idea
 
@@ -59,7 +59,6 @@ SPOT_HOSTNAME=
 SPOT_USERNAME=
 SPOT_PASSWORD=
 ```
-
 
 ## usage
 
@@ -207,8 +206,6 @@ Currently the spot-world mission execution functionality does not handle any mis
 The missions loop command has turned out to be a major use case for spot-world. Visitors to the office like to see the robot up and walking around. It's fun and allows for demonstration of the robot in action. I use a mission that performs various actions and poses at different points around the office, then run that mission on a loop.
 
 The loop will execute continously until broken be engageing the estop with `ctrl-c`. Be aware the robot will stop moving and sit. The robot will sit, and the estop will need to be cleared with `estop clear` and the motors powered on with `motors on`. If the loop was started while the robot was docked, the robot will return to the dock using the `robot return` command.
-
-<action shot>
 
 
 ## safety
