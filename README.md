@@ -13,7 +13,7 @@ Since then, I've made some further improvements to the experience to make spot-w
 
 Before diving in, take a look at some typical use cases for spot-world
 
-![spot world](https://github.com/vicgarcia/spot-world/raw/main/images/terminal.png)
+![usage example](https://github.com/vicgarcia/spot-world/raw/main/images/terminal.png)
 
 And an explanation ...
 
@@ -63,9 +63,9 @@ SPOT_PASSWORD=
 
 ## usage
 
-The first step to utilize spot-world is to record an autowalk map with a variety of actions, then use the tablet map editor to organize groups of actions into individual missions. For my development example, I built a map around the office to do a variety of inspection actions as well as poses at specific locations, then created missions as groups of the actions, such as a 'office-tour' mission that consists of visiting various locations in the office, or the 'industrial-gauge-demo' mission to demonstrate computer vision software.
+The first step to utilize spot-world is to record an autowalk map with a variety of actions, then use the tablet map editor to organize groups of actions into individual missions. For my development example, I built a map around the office to do a variety of inspection actions as well as poses at specific locations, then created missions as groups of the actions, such as a `goto-kitchen` mission that navigates the robot to the kitchen or a `whiteboard-photo` mission that captures photos of a whiteboard.
 
-<tablet screenshot>
+![usage example](https://github.com/vicgarcia/spot-world/raw/main/images/tablet.jpg)
 
 After creating the map and missions, use the tablet file manager app to copy the contents of the `<mission name>.walk` folder to a usb drive, then to the `./autowalks` folder in the spot-world repo.
 
